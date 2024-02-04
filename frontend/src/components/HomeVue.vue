@@ -11,9 +11,11 @@ const page = ref("login");
 const secret = ref("");
 const message = ref("");
 const spinner = ref(false);
-// const server = "http://localhost:5000";
-const server = "";
-const history = ref<ChatMessage[]>([{ sender: "Gigachat", message: "Hello, how can I help you?" }]);
+const server = "http://localhost:8000";
+// const server = "";
+const history = ref<ChatMessage[]>([
+  { sender: "Gigachat", message: "Hello, how can I help you?" },
+]);
 
 async function login() {
   if (secret.value) {
@@ -31,7 +33,7 @@ async function gigachat() {
   const response = await axios.post(
     `${server}/gigachat`,
     {
-      promt: message.value,
+      question: message.value,
     },
     {
       headers: {
@@ -61,20 +63,41 @@ async function gigachat() {
       <div class="justify-content-center">
         <p class="fs-3 text-center mb-3">SberGigaChat</p>
         <div id="history" class="text-start mb-3">
-          <div class="mb-3" v-for="item, index in history" :key="index">
-            <div class="bg-opacity-75 border rounded text-wrap text-light p-3 mb-2" 
-                :class="`bg-${Object.values(item)[0] === 'Gigachat' ? 'primary' : 'success'}`">
+          <div class="mb-3" v-for="(item, index) in history" :key="index">
+            <div
+              class="bg-opacity-75 border rounded text-wrap text-light p-3 mb-2"
+              :class="`bg-${
+                Object.values(item)[0] === 'Gigachat' ? 'primary' : 'success'
+              }`"
+            >
               {{ `${Object.values(item)[0]}: ${Object.values(item)[1]}` }}
             </div>
           </div>
         </div>
         <form class="mb-3" @submit.prevent="gigachat">
-          <textarea class="form-control" v-model="message" placeholder="Type your promt"></textarea>
+          <textarea
+            class="form-control"
+            v-model="message"
+            placeholder="Type your question"
+          ></textarea>
           <div class="btn-group mt-3 d-flex" role="group">
-            <button :disabled="spinner" class="btn btn-primary" type="submit">Send
-              <span v-if="spinner" class="spinner-border spinner-border-sm"></span>
+            <button :disabled="spinner" class="btn btn-primary" type="submit">
+              Send
+              <span
+                v-if="spinner"
+                class="spinner-border spinner-border-sm"
+              ></span>
             </button>
-            <button class="btn btn-secondary" @click="history = []; message = ''; spinner = false">Clear</button>
+            <button
+              class="btn btn-secondary"
+              @click="
+                history = [];
+                message = '';
+                spinner = false;
+              "
+            >
+              Clear
+            </button>
           </div>
         </form>
       </div>
@@ -85,14 +108,25 @@ async function gigachat() {
         <p class="fs-3 text-center mb-3">SberGigachat</p>
         <form class="row mb-3 text-center" @submit.prevent="login">
           <div class="col-auto">
-            <input class="form-control" type="text" v-model="secret" placeholder="Enter Authorization Key" />
+            <input
+              class="form-control"
+              type="password"
+              required
+              v-model="secret"
+              placeholder="Enter Authorization Key"
+            />
           </div>
           <div class="col-auto">
             <button class="btn btn-primary" type="submit">Submit</button>
           </div>
         </form>
         <div>
-          <a class="btn btn-link" href="https://developers.sber.ru/docs/ru/gigachat/api/integration" target="_blank">Подключение API</a>
+          <a
+            class="btn btn-link"
+            href="https://developers.sber.ru/docs/ru/gigachat/api/integration"
+            target="_blank"
+            >Подключение API</a
+          >
         </div>
       </div>
     </div>

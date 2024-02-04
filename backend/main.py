@@ -1,7 +1,8 @@
-from typing import Optional
+from typing import Union
 
 from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from gigachat import GigaChat
@@ -17,33 +18,37 @@ app.add_middleware(
 
 
 class GigaChatInput(BaseModel):
-    prompt: str
+    question: str
 
 
 class GigaChatOutput(BaseModel):
     answer: str
 
 
+app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+
 @app.get("/")
-async def read_root(path: Optional[str] = ""):
-    return FileResponse("/static/index.html")
+async def index():
+    return FileResponse("static/index.html")
 
 
-@app.post("/gigachat", response_model=GigaChatOutput)
+@app.post("/gigachat", response_model=GigaChatOutput, status_code=201)
 async def gigachat(
-    json_data: GigaChatInput, authorization: Optional[str] = Header(None)
+    item: GigaChatInput, Authorization: Union[str, None] = Header(default=None)
 ):
-    if authorization:
-        token = authorization.split(" ")[1]
+    if Authorization:
+        token = Authorization.split(" ")[1]
     else:
         token = None
-    answer = get_gigachat(token, json_data.prompt)
+    if not token:
+        raise HTTPException(status_code=401, detail="No token provided")
+    answer = get_gigachat(token, item.question)
     if not answer:
         raise HTTPException(status_code=400, detail="No answer from GigaChat")
     return {"answer": answer}
 
 
-def get_gigachat(client_secret, promt):
+def get_gigachat(client_secret, question):
     with GigaChat(credentials=client_secret, verify_ssl_certs=False) as giga:
-        response = giga.chat(promt)
+        response = giga.chat(question)
         return response.choices[0].message.content
