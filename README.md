@@ -1,4 +1,4 @@
-# Simple GigaChat (experimental)
+# Simple GigaChat (experimental, may be broken)
 
 Simple GigaChat is a Web Application that allows users to communicate with Sber GigaChat.
 

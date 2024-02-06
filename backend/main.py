@@ -1,8 +1,6 @@
-from typing import Union
-
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from gigachat import GigaChat
@@ -17,8 +15,16 @@ app.add_middleware(
 )
 
 
+class LoginInput(BaseModel):
+    username: str
+    password: str
+
+
 class GigaChatInput(BaseModel):
+    model: str
     question: str
+    auth: str
+    login: LoginInput
 
 
 class GigaChatOutput(BaseModel):
@@ -27,28 +33,31 @@ class GigaChatOutput(BaseModel):
 
 app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 
+
 @app.get("/")
 async def index():
     return FileResponse("static/index.html")
 
 
-@app.post("/gigachat", response_model=GigaChatOutput, status_code=201)
-async def gigachat(
-    item: GigaChatInput, Authorization: Union[str, None] = Header(default=None)
-):
-    if Authorization:
-        token = Authorization.split(" ")[1]
+@app.post("/gigachat/{typo}", response_model=GigaChatOutput, status_code=201)
+async def gigachat(typo: str, item: GigaChatInput):
+    if typo == "auth":
+        giga = GigaChat(
+            model=item.model, 
+            credentials=item.auth, 
+            verify_ssl_certs=False,
+            )
     else:
-        token = None
-    if not token:
-        raise HTTPException(status_code=401, detail="No token provided")
-    answer = get_gigachat(token, item.question)
+        giga = GigaChat(
+            base_url="",
+            user=item.login.username,
+            password=item.login.password,
+            verify_ssl_certs=False,
+        )
+
+    with giga:
+        response = giga.chat(item.question)
+        answer = response.choices[0].message.content
     if not answer:
-        raise HTTPException(status_code=400, detail="No answer from GigaChat")
+        raise HTTPException(status_code=400)
     return {"answer": answer}
-
-
-def get_gigachat(client_secret, question):
-    with GigaChat(credentials=client_secret, verify_ssl_certs=False) as giga:
-        response = giga.chat(question)
-        return response.choices[0].message.content
