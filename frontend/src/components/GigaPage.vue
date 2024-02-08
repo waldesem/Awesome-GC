@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GigaStore } from "../actions";
+import { GigaStore } from "../gigachat";
 
 const storeGiga = GigaStore();
 
@@ -15,7 +15,7 @@ const models: string[] = [];
           <label class="col-form-label" for="models">Models</label>
           <div class="col-auto">
             <select class="form-select" required name="models"
-                    v-model="storeGiga.GigaStore.model">
+                    v-model="storeGiga.ChatObj.model">
               <option v-for="item, index in models" :key="index"
                       :value="item">{{item}}
               </option>
@@ -23,7 +23,7 @@ const models: string[] = [];
           </div>
         </div>
         <div id="history" class="text-start mb-3">
-          <div class="mb-3" v-for="(item, index) in storeGiga.GigaStore.history" :key="index">
+          <div class="mb-3" v-for="(item, index) in storeGiga.ChatObj.history" :key="index">
             <div
               class="bg-opacity-75 border rounded text-wrap text-light p-3 mb-2"
               :class="`bg-${
@@ -34,26 +34,26 @@ const models: string[] = [];
             </div>
           </div>
         </div>
-        <form class="mb-3" @submit.prevent="gigachat">
+        <form class="mb-3" @submit.prevent="storeGiga.ChatObj.gigachat">
           <textarea
             class="form-control"
-            v-model="storeGiga.GigaStore.message"
+            v-model="storeGiga.ChatObj.message"
             placeholder="Type your question"
           ></textarea>
           <div class="btn-group mt-3 d-flex" role="group">
-            <button :disabled="storeGiga.GigaStore.spinner" class="btn btn-primary" type="submit">
+            <button :disabled="storeGiga.ChatObj.spinner" class="btn btn-primary" type="submit">
               Send
               <span
-                v-if="storeGiga.GigaStore.spinner"
+                v-if="storeGiga.ChatObj.spinner"
                 class="spinner-border spinner-border-sm"
               ></span>
             </button>
             <button
               class="btn btn-secondary"
               @click="
-                storeGiga.GigaStore.history = [];
-                storeGiga.GigaStore.message = '';
-                storeGiga.GigaStore.spinner = false;
+                storeGiga.ChatObj.history = [];
+                storeGiga.ChatObj.message = '';
+                storeGiga.ChatObj.spinner = false;
               "
             >
               Clear
@@ -84,3 +84,4 @@ const models: string[] = [];
   overflow-y: scroll;
 }
 </style>
+../gigachat

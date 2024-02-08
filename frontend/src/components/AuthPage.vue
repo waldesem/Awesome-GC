@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { GigaStore } from "../actions";
+import { GigaStore } from "../gigachat";
 import router from "../router";
 
 const storeGiga = GigaStore();
 
 const visible = ref(false);
+
+const switchForm = () => {
+  if (storeGiga.ChatObj.typo === 'logopass'){
+    storeGiga.ChatObj.typo = 'auth'
+  } else {
+    storeGiga.ChatObj.typo = 'logopass'
+  }
+};
 </script>
 
 <template>
@@ -74,11 +82,7 @@ const visible = ref(false);
           <button
             class="btn btn-secondary"
             type="button"
-            @click="
-              storeGiga.ChatObj.typo = 'auth'
-                ? storeGiga.ChatObj.typo === 'logopass'
-                : 'auth'
-            "
+            @click="switchForm"
           >
             {{
               "Enter with login and password"
@@ -112,3 +116,4 @@ const visible = ref(false);
   padding: 20px;
 }
 </style>
+../gigachat
