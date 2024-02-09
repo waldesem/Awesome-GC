@@ -23,26 +23,27 @@ const switchForm = () => {
         <p class="fs-3 text-center mb-3">SberGigachat</p>
         <div v-if="storeGiga.ChatObj.typo === 'auth'">
           <form
-            class="row mb-3 text-center"
+            class="mb-3"
             @submit.prevent="router.push({ name: 'gigachat' })"
           >
-            <div class="col-auto">
+            <div class="mb-3">
               <div class="input-group">
                 <input
                   class="form-control"
                   type="password"
+                  autocomplete="current-password"
                   required
                   v-model="storeGiga.ChatObj.secret"
                   placeholder="Enter Authorization Key"
                 />
                 <span class="input-group-text">
                   <a role="button" @click="visible = !visible">
-                    {{ "Hide" ? visible : "Show" }}
+                    {{ visible ? "Hide" : "Show" }}
                   </a>
                 </span>
               </div>
             </div>
-            <div class="col-auto">
+            <div class="d-grid gap-2 mb-3">
               <button class="btn btn-primary" type="submit">Submit</button>
             </div>
           </form>
@@ -50,46 +51,49 @@ const switchForm = () => {
 
         <div v-else>
           <form
-            class="mb-3 text-center"
+            class="mb-3"
             @submit.prevent="router.push({ name: 'gigachat' })"
           >
             <input
-              class="form-control"
+              class="form-control mb-3"
               type="text"
               required
               v-model="storeGiga.ChatObj.logopass.username"
               placeholder="Enter username"
             />
-            <div class="input-group">
+            <div class="input-group mb-3">
               <input
                 class="form-control"
                 type="password"
+                autocomplete="current-password"
                 required
                 v-model="storeGiga.ChatObj.logopass.password"
                 placeholder="Enter password"
               />
               <span class="input-group-text">
                 <a role="button" @click="visible = !visible">
-                  {{ "Hide" ? visible : "Show" }}
+                  {{ visible ? "Hide" : "Show" }}
                 </a>
               </span>
             </div>
-            <button class="btn btn-primary" type="submit">Submit</button>
+            <div class="d-grid gap-2 mb-3">
+              <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
           </form>
         </div>
 
         <div>
-          <button
-            class="btn btn-secondary"
+          <a
+            class="btn btn-link"
             type="button"
             @click="switchForm"
           >
             {{
-              "Enter with login and password"
-                ? storeGiga.ChatObj.typo === "logopass"
+              storeGiga.ChatObj.typo === "auth"
+                ? "Enter with login/password"
                 : "Enter with authorization data"
             }}
-          </button>
+          </a>
           <a
             class="btn btn-link"
             href="https://developers.sber.ru/docs/ru/gigachat/api/integration"

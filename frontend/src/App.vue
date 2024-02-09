@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import { onBeforeMount } from "vue";
 import router from "./router";
 
-onBeforeMount(() => {
-  router.push({ name: 'auth' });
-});
+router.push({ name: 'auth' });
 </script>
 
 <template>

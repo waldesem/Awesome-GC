@@ -67,8 +67,8 @@ const models: string[] = [];
 
 <style scoped>
 #gigachat {
-  max-width: 50vh;
-  min-height: 75vh;
+  max-width: 75vh;
+  min-height: 50vh;
   margin: 0 auto;
   padding: 1rem;
   border: 1px solid #ccc;
@@ -80,8 +80,7 @@ const models: string[] = [];
   padding: 20px;
 }
 #gigachat #history {
-  height: 800px;
+  height: 600px;
   overflow-y: scroll;
 }
 </style>
-../gigachat
