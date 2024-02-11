@@ -3,7 +3,6 @@ import { GigaStore } from "../gigachat";
 
 const storeGiga = GigaStore();
 
-const models: string[] = [];
 </script>
 
 <template>
@@ -12,13 +11,14 @@ const models: string[] = [];
       <div class="justify-content-center">
         <p class="fs-3 text-center mb-3">SberGigaChat</p>
         <div class="mb-3 row">
-          <label class="col-form-label" for="models">Models</label>
           <div class="col-auto">
-            <select class="form-select" required name="models"
+            <label class="form-label" for="models">Models</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select form-select-sm" required name="models"
                     v-model="storeGiga.ChatObj.model">
-              <option v-for="item, index in models" :key="index"
-                      :value="item">{{item}}
-              </option>
+              <option selected value="GigaChat">GigaChat</option>
+              <option value="GigaChat-Pro">GigaChat-Pro</option>
             </select>
           </div>
         </div>
@@ -37,6 +37,7 @@ const models: string[] = [];
         <form class="mb-3" @submit.prevent="storeGiga.ChatObj.gigachat">
           <textarea
             class="form-control"
+            required
             v-model="storeGiga.ChatObj.message"
             placeholder="Type your question"
           ></textarea>
