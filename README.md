@@ -1,4 +1,4 @@
-# Simple GigaChat (experimental, may be broken)
+# Simple GigaChat (experimental)
 
 Simple GigaChat is a Web Application that allows users to communicate with Sber GigaChat.
 
@@ -27,7 +27,7 @@ To start the application at run the following command in your terminal:
 uvicorn main:app --reload
 ```
 
-### Uvicorn Service
+### Uvicorn Service (not tested yet)
 For create systemd service run the following command in your terminal:
 ```
 sudo nano /etc/systemd/system/smgigachat.service
