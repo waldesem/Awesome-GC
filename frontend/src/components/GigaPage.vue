@@ -3,7 +3,7 @@ import { GigaStore } from "../gigachat";
 
 const storeGiga = GigaStore();
 
-const models: string[] = [];
+const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
 </script>
 
 <template>
