@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const router = createRouter({
+export const router = createRouter({
   routes: [
     {
       path: '/',
@@ -24,5 +24,3 @@ const router = createRouter({
   ],
   history: createWebHistory()
 });
-
-export default router;

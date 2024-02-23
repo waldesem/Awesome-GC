@@ -1,19 +1,22 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { GigaStore } from "../gigachat";
-import router from "../router";
+import { router } from "../router";
 
-const storeGiga = GigaStore();
+const loginObj = ref({
+  visible: false,
+  authTypo: localStorage.getItem("gigachattypo") || "auth",
+  gigaSecret: localStorage.getItem("gigachatsecret") || "",
+  gigaUsername: localStorage.getItem("gigachatusername") || "",
+  gigaPassword: localStorage.getItem("gigachatpassword") || "",
 
-const visible = ref(false);
-
-const switchForm = () => {
-  if (storeGiga.ChatObj.typo === 'logopass'){
-    storeGiga.ChatObj.typo = 'auth'
-  } else {
-    storeGiga.ChatObj.typo = 'logopass'
+  switchForm: function() {
+    if (this.authTypo === 'logopass'){
+      localStorage.setItem("gigachattypo", 'auth')
+    } else {
+      localStorage.setItem("gigachattypo", 'logopass')
+    }
   }
-};
+});
 </script>
 
 <template>
@@ -21,7 +24,7 @@ const switchForm = () => {
     <div id="auth">
       <div class="row justify-content-center">
         <p class="fs-3 text-center mb-3">SberGigachat</p>
-        <div v-if="storeGiga.ChatObj.typo === 'auth'">
+        <div v-if="loginObj.authTypo === 'auth'">
           <form
             class="mb-3"
             @submit.prevent="router.push({ name: 'gigachat' })"
@@ -30,15 +33,15 @@ const switchForm = () => {
               <div class="input-group">
                 <input
                   class="form-control"
-                  :type="visible? 'text' : 'password'"
+                  :type="loginObj.visible? 'text' : 'password'"
                   autocomplete="current-password"
                   required
-                  v-model="storeGiga.ChatObj.secret"
+                  v-model="loginObj.gigaSecret"
                   placeholder="Enter Authorization Key"
                 />
                 <span class="input-group-text">
-                  <a role="button" @click="visible = !visible">
-                    {{ visible ? "Hide" : "Show" }}
+                  <a role="button" @click="loginObj.visible = !loginObj.visible">
+                    {{ loginObj.visible ? "Hide" : "Show" }}
                   </a>
                 </span>
               </div>
@@ -58,21 +61,21 @@ const switchForm = () => {
               class="form-control mb-3"
               type="text"
               required
-              v-model="storeGiga.ChatObj.logopass.username"
+              v-model="loginObj.gigaUsername"
               placeholder="Enter username"
             />
             <div class="input-group mb-3">
               <input
                 class="form-control"
-                :type="visible? 'text' : 'password'"
+                :type="loginObj.visible? 'text' : 'password'"
                 autocomplete="current-password"
                 required
-                v-model="storeGiga.ChatObj.logopass.password"
+                v-model="loginObj.gigaPassword"
                 placeholder="Enter password"
               />
               <span class="input-group-text">
-                <a role="button" @click="visible = !visible">
-                  {{ visible ? "Hide" : "Show" }}
+                <a role="button" @click="loginObj.visible = !loginObj.visible">
+                  {{ loginObj.visible ? "Hide" : "Show" }}
                 </a>
               </span>
             </div>
@@ -86,10 +89,10 @@ const switchForm = () => {
           <a
             class="btn btn-link"
             type="button"
-            @click="switchForm"
+            @click="loginObj.switchForm"
           >
             {{
-              storeGiga.ChatObj.typo === "auth"
+              loginObj.authTypo === "auth"
                 ? "Enter with login/password"
                 : "Enter with authorization data"
             }}
@@ -120,4 +123,3 @@ const switchForm = () => {
   padding: 20px;
 }
 </style>
-../gigachat

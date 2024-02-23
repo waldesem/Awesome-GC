@@ -1,7 +1,62 @@
 <script setup lang="ts">
-import { GigaStore } from "../gigachat";
+import axios from "axios";
+import { ref } from "vue";
+import { router } from "../router";
 
-const storeGiga = GigaStore();
+interface ChatMessage {
+  sender: string;
+  message: string;
+}
+
+interface LogoPass {
+  username: string;
+  password: string;
+}
+
+const server = "http://localhost:8000";
+// const server = "";
+
+const chatObj = ref({
+  typo: localStorage.getItem("gigachattypo") || "auth",
+  secret: localStorage.getItem("gigachatsecret") || "",
+  logopass: <LogoPass>({
+    username: localStorage.getItem("gigachatusername") || "",
+    password: localStorage.getItem("gigachatpassword") || "",
+  }),
+  message: "",
+  model: "",
+  spinner: false,
+  history: <ChatMessage[]>([
+    { sender: "Gigachat", message: "Hello, how can I help you?" },
+  ]),
+  async gigachat() {
+    this.spinner = true;
+    this.history.push({ sender: "You", message: this.message });
+    const element = document.getElementById("history");
+    element?.scrollTo(0, 9999999999999999999999);
+    const response = await axios.post(
+      `${server}/gigachat/${this.typo}`,
+      {
+        model: this.model,
+        question: this.message,
+        auth: this.secret,
+        login: this.logopass,
+      }
+    );
+    const status = response.status;
+
+    if (status === 201) {
+      this.message = "";
+      const { answer } = await response.data;
+      this.history.push({ sender: "Gigachat", message: answer });
+      element?.scrollTo(0, 9999999999999999999999);
+    } else {
+      router.push({ name: "auth" });
+      alert("Something went wrong. Check authorization data or retry later");
+    }
+    this.spinner = false;
+  },
+});
 
 const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
 </script>
@@ -17,7 +72,7 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
           </div>
           <div class="col-auto">
             <select class="form-select" required name="models"
-                    v-model="storeGiga.ChatObj.model">
+                    v-model="chatObj.model">
               <option v-for="item, index in models" :key="index"
                       :value="item">{{item}}
               </option>
@@ -25,7 +80,7 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
           </div>
         </div>
         <div id="history" class="text-start mb-3">
-          <div class="mb-3" v-for="(item, index) in storeGiga.ChatObj.history" :key="index">
+          <div class="mb-3" v-for="(item, index) in chatObj.history" :key="index">
             <div
               class="bg-opacity-75 border rounded text-wrap text-light p-3 mb-2"
               :class="`bg-${
@@ -36,27 +91,27 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
             </div>
           </div>
         </div>
-        <form class="mb-3" @submit.prevent="storeGiga.ChatObj.gigachat">
+        <form class="mb-3" @submit.prevent="chatObj.gigachat">
           <textarea
             class="form-control"
             required
-            v-model="storeGiga.ChatObj.message"
+            v-model="chatObj.message"
             placeholder="Type your question"
           ></textarea>
           <div class="btn-group mt-3 d-flex" role="group">
-            <button :disabled="storeGiga.ChatObj.spinner" class="btn btn-primary" type="submit">
+            <button :disabled="chatObj.spinner" class="btn btn-primary" type="submit">
               Send
               <span
-                v-if="storeGiga.ChatObj.spinner"
+                v-if="chatObj.spinner"
                 class="spinner-border spinner-border-sm"
               ></span>
             </button>
             <button
               class="btn btn-secondary"
               @click="
-                storeGiga.ChatObj.history = [];
-                storeGiga.ChatObj.message = '';
-                storeGiga.ChatObj.spinner = false;
+                chatObj.history = [];
+                chatObj.message = '';
+                chatObj.spinner = false;
               "
             >
               Clear
