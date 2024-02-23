@@ -16,10 +16,11 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
             <label class="form-label" for="models">Models</label>
           </div>
           <div class="col-auto">
-            <select class="form-select form-select-sm" required name="models"
+            <select class="form-select" required name="models"
                     v-model="storeGiga.ChatObj.model">
-              <option selected value="GigaChat">GigaChat</option>
-              <option value="GigaChat-Pro">GigaChat-Pro</option>
+              <option v-for="item, index in models" :key="index"
+                      :value="item">{{item}}
+              </option>
             </select>
           </div>
         </div>
