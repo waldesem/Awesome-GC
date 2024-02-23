@@ -1,9 +1,8 @@
-import { createApp, defineAsyncComponent } from 'vue'
-import { router } from "./router";
+import { createApp } from "vue";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.min.js";
 
-const App = defineAsyncComponent(() => import("./App.vue"));
+import App from "./App.vue";
 
-createApp(App).use(router).mount("#app");
+createApp(App).mount("#app");

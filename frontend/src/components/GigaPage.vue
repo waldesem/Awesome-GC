@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
 import { ref } from "vue";
-import { router } from "../router";
 
 interface ChatMessage {
   sender: string;
@@ -13,15 +12,16 @@ interface LogoPass {
   password: string;
 }
 
-const server = "http://localhost:8000";
-// const server = "";
+// const server = "http://localhost:8000";
+const server = "";
 
 const chatObj = ref({
-  typo: localStorage.getItem("gigachattypo") || "auth",
-  secret: localStorage.getItem("gigachatsecret") || "",
+  visible: false,
+  typo: "auth",
+  secret: "",
   logopass: <LogoPass>{
-    username: localStorage.getItem("gigachatusername") || "",
-    password: localStorage.getItem("gigachatpassword") || "",
+    username: "",
+    password: "",
   },
   message: "",
   model: "",
@@ -29,7 +29,12 @@ const chatObj = ref({
   history: <ChatMessage[]>[
     { sender: "Gigachat", message: "Hello, how can I help you?" },
   ],
-  async gigachat() {
+
+  switchForm: function () {
+    this.typo = this.typo === "auth" ? "logopass" : "auth";
+  },
+
+  gigachat: async function () {
     this.spinner = true;
     this.history.push({ sender: "You", message: this.message });
     const element = document.getElementById("history");
@@ -48,7 +53,7 @@ const chatObj = ref({
       this.history.push({ sender: "Gigachat", message: answer });
       element?.scrollTo(0, 9999999999999999999999);
     } else {
-      router.push({ name: "auth" });
+      chatObj.value.typo = "auth";
       alert("Something went wrong. Check authorization data or retry later");
     }
     this.spinner = false;
@@ -60,7 +65,83 @@ const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
 
 <template>
   <div class="container">
-    <div id="gigachat">
+    <div v-f="chatObj.typo !== 'gigachat'" id="auth">
+      <div class="row justify-content-center">
+        <p class="fs-3 text-center mb-3">SberGigachat</p>
+        <div v-if="chatObj.typo === 'auth'">
+          <form class="mb-3" @submit.prevent="chatObj.typo = 'gigachat'">
+            <div class="mb-3">
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  :type="chatObj.visible ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  required
+                  v-model="chatObj.secret"
+                  placeholder="Enter Authorization Key"
+                />
+                <span class="input-group-text">
+                  <a role="button" @click="chatObj.visible = !chatObj.visible">
+                    {{ chatObj.visible ? "Hide" : "Show" }}
+                  </a>
+                </span>
+              </div>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+              <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+
+        <div v-else>
+          <form class="mb-3" @submit.prevent="chatObj.typo = 'gigachat'">
+            <input
+              class="form-control mb-3"
+              type="text"
+              required
+              v-model="chatObj.logopass.username"
+              placeholder="Enter username"
+            />
+            <div class="input-group mb-3">
+              <input
+                class="form-control"
+                :type="chatObj.visible ? 'text' : 'password'"
+                autocomplete="current-password"
+                required
+                v-model="chatObj.logopass.password"
+                placeholder="Enter password"
+              />
+              <span class="input-group-text">
+                <a role="button" @click="chatObj.visible = !chatObj.visible">
+                  {{ chatObj.visible ? "Hide" : "Show" }}
+                </a>
+              </span>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+              <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+
+        <div>
+          <a class="btn btn-link" type="button" @click="chatObj.switchForm">
+            {{
+              chatObj.typo === "auth"
+                ? "Enter with login/password"
+                : "Enter with authorization data"
+            }}
+          </a>
+          <a
+            class="btn btn-link"
+            href="https://developers.sber.ru/docs/ru/gigachat/api/integration"
+            target="_blank"
+            >Подключение API</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div v-if="chatObj.typo === 'gigachat'" id="gigachat">
       <div class="justify-content-center">
         <p class="fs-3 text-center mb-3">SberGigaChat</p>
         <div class="mb-3 row">
@@ -137,6 +218,18 @@ const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
 </template>
 
 <style scoped>
+#auth {
+  max-width: 50vh;
+  margin: 0 auto;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f8f8f8;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  padding: 20px;
+}
 #gigachat {
   max-width: 75vh;
   min-height: 50vh;
