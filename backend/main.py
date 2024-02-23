@@ -30,9 +30,7 @@ class GigaChatInput(BaseModel):
 class GigaChatOutput(BaseModel):
     answer: str
 
-
 app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
-
 
 @app.get("/")
 async def index():

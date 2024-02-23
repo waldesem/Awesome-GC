@@ -30,7 +30,7 @@ const switchForm = () => {
               <div class="input-group">
                 <input
                   class="form-control"
-                  type="password"
+                  :type="visible? 'text' : 'password'"
                   autocomplete="current-password"
                   required
                   v-model="storeGiga.ChatObj.secret"
@@ -64,7 +64,7 @@ const switchForm = () => {
             <div class="input-group mb-3">
               <input
                 class="form-control"
-                type="password"
+                :type="visible? 'text' : 'password'"
                 autocomplete="current-password"
                 required
                 v-model="storeGiga.ChatObj.logopass.password"

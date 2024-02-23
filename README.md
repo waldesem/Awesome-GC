@@ -27,7 +27,7 @@ To start the application at run the following command in your terminal:
 uvicorn main:app --reload
 ```
 
-### Uvicorn Service
+### Uvicorn Service (not tested yet)
 For create systemd service run the following command in your terminal:
 ```
 sudo nano /etc/systemd/system/smgigachat.service
