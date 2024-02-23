@@ -4,18 +4,26 @@ import { router } from "../router";
 
 const loginObj = ref({
   visible: false,
-  authTypo: localStorage.getItem("gigachattypo") || "auth",
-  gigaSecret: localStorage.getItem("gigachatsecret") || "",
-  gigaUsername: localStorage.getItem("gigachatusername") || "",
-  gigaPassword: localStorage.getItem("gigachatpassword") || "",
+  typo: "auth",
+  secret: "",
+  username: "",
+  password: "",
 
-  switchForm: function() {
-    if (this.authTypo === 'logopass'){
-      localStorage.setItem("gigachattypo", 'auth')
+  submitForm: function () {
+    if (this.typo === "logopass") {
+      localStorage.setItem("gigachattypo", "logopass");
+      localStorage.setItem("gigachatusername", this.username);
+      localStorage.setItem("gigachatpassword", this.password);
     } else {
-      localStorage.setItem("gigachattypo", 'logopass')
+      localStorage.setItem("gigachattypo", "auth");
+      localStorage.setItem("gigachatsecret", this.secret);
     }
-  }
+    router.push({ name: "gigachat" });
+  },
+
+  switchForm: function () {
+    this.typo = this.typo === "auth" ? "logopass" : "auth";
+  },
 });
 </script>
 
@@ -24,7 +32,7 @@ const loginObj = ref({
     <div id="auth">
       <div class="row justify-content-center">
         <p class="fs-3 text-center mb-3">SberGigachat</p>
-        <div v-if="loginObj.authTypo === 'auth'">
+        <div v-if="loginObj.typo === 'auth'">
           <form
             class="mb-3"
             @submit.prevent="router.push({ name: 'gigachat' })"
@@ -33,14 +41,17 @@ const loginObj = ref({
               <div class="input-group">
                 <input
                   class="form-control"
-                  :type="loginObj.visible? 'text' : 'password'"
+                  :type="loginObj.visible ? 'text' : 'password'"
                   autocomplete="current-password"
                   required
-                  v-model="loginObj.gigaSecret"
+                  v-model="loginObj.secret"
                   placeholder="Enter Authorization Key"
                 />
                 <span class="input-group-text">
-                  <a role="button" @click="loginObj.visible = !loginObj.visible">
+                  <a
+                    role="button"
+                    @click="loginObj.visible = !loginObj.visible"
+                  >
                     {{ loginObj.visible ? "Hide" : "Show" }}
                   </a>
                 </span>
@@ -61,16 +72,16 @@ const loginObj = ref({
               class="form-control mb-3"
               type="text"
               required
-              v-model="loginObj.gigaUsername"
+              v-model="loginObj.username"
               placeholder="Enter username"
             />
             <div class="input-group mb-3">
               <input
                 class="form-control"
-                :type="loginObj.visible? 'text' : 'password'"
+                :type="loginObj.visible ? 'text' : 'password'"
                 autocomplete="current-password"
                 required
-                v-model="loginObj.gigaPassword"
+                v-model="loginObj.password"
                 placeholder="Enter password"
               />
               <span class="input-group-text">
@@ -86,13 +97,9 @@ const loginObj = ref({
         </div>
 
         <div>
-          <a
-            class="btn btn-link"
-            type="button"
-            @click="loginObj.switchForm"
-          >
+          <a class="btn btn-link" type="button" @click="loginObj.switchForm">
             {{
-              loginObj.authTypo === "auth"
+              loginObj.typo === "auth"
                 ? "Enter with login/password"
                 : "Enter with authorization data"
             }}

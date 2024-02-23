@@ -19,30 +19,27 @@ const server = "http://localhost:8000";
 const chatObj = ref({
   typo: localStorage.getItem("gigachattypo") || "auth",
   secret: localStorage.getItem("gigachatsecret") || "",
-  logopass: <LogoPass>({
+  logopass: <LogoPass>{
     username: localStorage.getItem("gigachatusername") || "",
     password: localStorage.getItem("gigachatpassword") || "",
-  }),
+  },
   message: "",
   model: "",
   spinner: false,
-  history: <ChatMessage[]>([
+  history: <ChatMessage[]>[
     { sender: "Gigachat", message: "Hello, how can I help you?" },
-  ]),
+  ],
   async gigachat() {
     this.spinner = true;
     this.history.push({ sender: "You", message: this.message });
     const element = document.getElementById("history");
     element?.scrollTo(0, 9999999999999999999999);
-    const response = await axios.post(
-      `${server}/gigachat/${this.typo}`,
-      {
-        model: this.model,
-        question: this.message,
-        auth: this.secret,
-        login: this.logopass,
-      }
-    );
+    const response = await axios.post(`${server}/gigachat/${this.typo}`, {
+      model: this.model,
+      question: this.message,
+      auth: this.secret,
+      login: this.logopass,
+    });
     const status = response.status;
 
     if (status === 201) {
@@ -58,7 +55,7 @@ const chatObj = ref({
   },
 });
 
-const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
+const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
 </script>
 
 <template>
@@ -71,16 +68,28 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
             <label class="form-label" for="models">Models</label>
           </div>
           <div class="col-auto">
-            <select class="form-select" required name="models"
-                    v-model="chatObj.model">
-              <option v-for="item, index in models" :key="index"
-                      :value="item">{{item}}
+            <select
+              class="form-select"
+              required
+              name="models"
+              v-model="chatObj.model"
+            >
+              <option
+                v-for="(item, index) in models"
+                :key="index"
+                :value="item"
+              >
+                {{ item }}
               </option>
             </select>
           </div>
         </div>
         <div id="history" class="text-start mb-3">
-          <div class="mb-3" v-for="(item, index) in chatObj.history" :key="index">
+          <div
+            class="mb-3"
+            v-for="(item, index) in chatObj.history"
+            :key="index"
+          >
             <div
               class="bg-opacity-75 border rounded text-wrap text-light p-3 mb-2"
               :class="`bg-${
@@ -99,7 +108,11 @@ const models: string[] = ['GigaChat', 'GigaChat-Plus', 'GigaChat-Pro'];
             placeholder="Type your question"
           ></textarea>
           <div class="btn-group mt-3 d-flex" role="group">
-            <button :disabled="chatObj.spinner" class="btn btn-primary" type="submit">
+            <button
+              :disabled="chatObj.spinner"
+              class="btn btn-primary"
+              type="submit"
+            >
               Send
               <span
                 v-if="chatObj.spinner"
