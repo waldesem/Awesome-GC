@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 interface ChatMessage {
   sender: string;
@@ -24,35 +24,32 @@ const chatObj = ref({
     password: "",
   },
   message: "",
-  model: "",
   spinner: false,
+  model: "",
+  models: ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"],
   history: <ChatMessage[]>[
     { sender: "Gigachat", message: "Hello, how can I help you?" },
   ],
-
-  switchForm: function () {
-    this.typo = this.typo === "auth" ? "logopass" : "auth";
-  },
 
   gigachat: async function () {
     this.spinner = true;
     this.history.push({ sender: "You", message: this.message });
     const element = document.getElementById("history");
     element?.scrollTo(0, 9999999999999999999999);
-    const response = await axios.post(`${server}/gigachat/${this.typo}`, {
-      model: this.model,
-      question: this.message,
-      auth: this.secret,
-      login: this.logopass,
-    });
-    const status = response.status;
-
-    if (status === 201) {
+    try {
+      const response = await axios.post(`${server}/gigachat/${this.typo}`, {
+        model: this.model,
+        question: this.message,
+        auth: this.secret,
+        login: this.logopass,
+      });
+      console.log(response.status);
       this.message = "";
-      const { answer } = await response.data;
+      const { answer } = response.data;
       this.history.push({ sender: "Gigachat", message: answer });
       element?.scrollTo(0, 9999999999999999999999);
-    } else {
+    } catch (error) {
+      console.log(error);
       chatObj.value.typo = "auth";
       alert("Something went wrong. Check authorization data or retry later");
     }
@@ -60,25 +57,52 @@ const chatObj = ref({
   },
 });
 
-const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
+const selectedModel = computed(() => {
+  return chatObj.value.models[0];
+});
 </script>
 
 <template>
   <div class="container">
-    <div v-f="chatObj.typo !== 'gigachat'" id="auth">
-      <div class="row justify-content-center">
-        <p class="fs-3 text-center mb-3">SberGigachat</p>
-        <div v-if="chatObj.typo === 'auth'">
-          <form class="mb-3" @submit.prevent="chatObj.typo = 'gigachat'">
+    <div class="row justify-content-center">
+      <div v-if="chatObj.typo !== 'gigachat'" id="auth">
+        <p class="fs-3 text-center mb-3">SberGigaLogin</p>
+        <form class="mb-3" @submit.prevent="chatObj.typo = 'gigachat'">
+          <div v-if="chatObj.typo === 'auth'" class="mb-3">
+            <div class="input-group">
+              <input
+                class="form-control"
+                :type="chatObj.visible ? 'text' : 'password'"
+                autocomplete="current-password"
+                required
+                v-model="chatObj.secret"
+                placeholder="Enter Authorization Key"
+              />
+              <span class="input-group-text">
+                <a role="button" @click="chatObj.visible = !chatObj.visible">
+                  {{ chatObj.visible ? "Hide" : "Show" }}
+                </a>
+              </span>
+            </div>
+          </div>
+
+          <div v-else class="mb-3">
             <div class="mb-3">
-              <div class="input-group">
+              <input
+                class="form-control mb-3"
+                type="text"
+                required
+                v-model="chatObj.logopass.username"
+                placeholder="Enter username"
+              />
+              <div class="input-group mb-3">
                 <input
                   class="form-control"
                   :type="chatObj.visible ? 'text' : 'password'"
                   autocomplete="current-password"
                   required
-                  v-model="chatObj.secret"
-                  placeholder="Enter Authorization Key"
+                  v-model="chatObj.logopass.password"
+                  placeholder="Enter password"
                 />
                 <span class="input-group-text">
                   <a role="button" @click="chatObj.visible = !chatObj.visible">
@@ -87,44 +111,22 @@ const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
                 </span>
               </div>
             </div>
-            <div class="d-grid gap-2 mb-3">
-              <button class="btn btn-primary" type="submit">Submit</button>
-            </div>
-          </form>
-        </div>
+          </div>
 
-        <div v-else>
-          <form class="mb-3" @submit.prevent="chatObj.typo = 'gigachat'">
-            <input
-              class="form-control mb-3"
-              type="text"
-              required
-              v-model="chatObj.logopass.username"
-              placeholder="Enter username"
-            />
-            <div class="input-group mb-3">
-              <input
-                class="form-control"
-                :type="chatObj.visible ? 'text' : 'password'"
-                autocomplete="current-password"
-                required
-                v-model="chatObj.logopass.password"
-                placeholder="Enter password"
-              />
-              <span class="input-group-text">
-                <a role="button" @click="chatObj.visible = !chatObj.visible">
-                  {{ chatObj.visible ? "Hide" : "Show" }}
-                </a>
-              </span>
-            </div>
-            <div class="d-grid gap-2 mb-3">
-              <button class="btn btn-primary" type="submit">Submit</button>
-            </div>
-          </form>
-        </div>
+          <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-primary" type="submit">Submit</button>
+          </div>
+        </form>
 
-        <div>
-          <a class="btn btn-link" type="button" @click="chatObj.switchForm">
+        <div class="mb-3">
+          <a
+            class="btn btn-link"
+            role="button"
+            type="button"
+            @click="
+              chatObj.typo = chatObj.typo === 'auth' ? 'logopass' : 'auth'
+            "
+          >
             {{
               chatObj.typo === "auth"
                 ? "Enter with login/password"
@@ -138,32 +140,27 @@ const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
             >Подключение API</a
           >
         </div>
+        <p class="fw-light text-danger text-center">
+          Nothing data not be saved on server
+        </p>
       </div>
-    </div>
 
-    <div v-if="chatObj.typo === 'gigachat'" id="gigachat">
-      <div class="justify-content-center">
+      <div v-if="chatObj.typo === 'gigachat'" id="gigachat">
         <p class="fs-3 text-center mb-3">SberGigaChat</p>
         <div class="mb-3 row">
-          <div class="col-auto">
-            <label class="form-label" for="models">Models</label>
-          </div>
-          <div class="col-auto">
-            <select
-              class="form-select"
-              required
-              name="models"
-              v-model="chatObj.model"
+          <select
+            class="form-select"
+            name="models"
+            v-model="selectedModel"
+          >
+            <option
+              v-for="(item, index) in chatObj.models"
+              :key="index"
+              :value="item"
             >
-              <option
-                v-for="(item, index) in models"
-                :key="index"
-                :value="item"
-              >
-                {{ item }}
-              </option>
-            </select>
-          </div>
+              {{ item }}
+            </option>
+          </select>
         </div>
         <div id="history" class="text-start mb-3">
           <div
@@ -202,6 +199,7 @@ const models: string[] = ["GigaChat", "GigaChat-Plus", "GigaChat-Pro"];
             </button>
             <button
               class="btn btn-secondary"
+              type="reset"
               @click="
                 chatObj.history = [];
                 chatObj.message = '';
