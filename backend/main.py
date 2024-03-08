@@ -30,21 +30,43 @@ class GigaChatInput(BaseModel):
 class GigaChatOutput(BaseModel):
     answer: str
 
+
 app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+
 
 @app.get("/")
 async def index():
     return FileResponse("static/index.html")
 
 
+"""Authenticate with GigaChat and get a response.
+
+If 'auth' is passed, authenticate with the provided credentials. 
+Otherwise, authenticate with the provided username and password.
+
+Chat with the GigaChat model using the provided question. 
+Return the first response from GigaChat. Raise an exception if no 
+response is received.
+
+Args:
+  typo: Either 'auth' or any other value. 
+  item: GigaChatInput object with credentials and question.
+
+Returns:
+  GigaChatOutput object with the GigaChat response.
+
+Raises:
+  HTTPException: If no response received from GigaChat.
+"""
 @app.post("/gigachat/{typo}", response_model=GigaChatOutput, status_code=201)
+
 async def gigachat(typo: str, item: GigaChatInput):
     if typo == "auth":
         giga = GigaChat(
-            model=item.model, 
-            credentials=item.auth, 
+            model=item.model,
+            credentials=item.auth,
             verify_ssl_certs=False,
-            )
+        )
     else:
         giga = GigaChat(
             base_url="",

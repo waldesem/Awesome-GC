@@ -12,9 +12,27 @@ interface LogoPass {
   password: string;
 }
 
-// const server = "http://localhost:8000";
-const server = "";
+const server = "http://localhost:8000";
+// const server = "";
 
+/**
+ * chatObj is a reactive reference to an object that contains the state 
+ * and methods for a chat interface.
+ * 
+ * It has properties for:
+ * - visibility state
+ * - auth type 
+ * - secret auth key  
+ * - username/password credentials
+ * - current message 
+ * - loading spinner state
+ * - chatbot model name
+ * - available model names
+ * - chat history array
+ * 
+ * It has a gigachat method that handles sending a message to the API
+ * and updating the chat history with the response.
+ */
 const chatObj = ref({
   visible: false,
   typo: "auth",
